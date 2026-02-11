@@ -56,7 +56,7 @@ function RightSide() {
   const streamUrl = `${baseUrl}/master.m3u8`;
   const captionUrl = `${baseUrl}/captions.vtt`;
   const albumArt =
-    "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/system-playlists-user_39QysGaWaslkGGJlmYOrHFreGO5-1770748000382-Screenshot+2026-02-10+at+11.23.02%E2%80%AFPM.png";
+    "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png";
 
   const songInfo = {
     title: "Aayega Maza Ab Barsaat Ka",
@@ -211,7 +211,7 @@ function RightSide() {
           // Auto-scroll to active lyric
           if (newCueIndex !== -1 && lyricsContainerRef.current) {
             const activeLine = lyricsContainerRef.current.querySelector(
-              `[data-index="${newCueIndex}"]`
+              `[data-index="${newCueIndex}"]`,
             );
             if (activeLine) {
               activeLine.scrollIntoView({
@@ -334,12 +334,12 @@ function RightSide() {
   };
 
   return (
-    <div className="mx-auto pl-4 w-[25%] flex flex-col bg-gradient-to-b from-gray-900 to-black min-h-screen">
+    <div className=" pl-4 w-[25%]  flex flex-col  h-full overflow-hidden">
       {/* Hidden audio element */}
       <audio ref={audioRef} preload="metadata" />
 
       {/* Album Art */}
-      <div className="w-[94%] mx-auto mt-4 h-[25%] shadow-2xl rounded-2xl overflow-hidden relative group">
+      <div className="w-[94%] mx-auto mt-4 h-[20%] shadow-2xl rounded-2xl overflow-hidden relative group">
         <img
           src={albumArt}
           alt="Album Art"
@@ -349,15 +349,16 @@ function RightSide() {
           {status}
         </div> */}
       </div>
-
       {/* Lyrics Section */}
-      <div className="m-3 h-[50%] rounded-2xl p-4 shadow-lg overflow-y-auto bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm relative">
-        <div className="sticky top-0 bg-gray-900/80 backdrop-blur-md px-2 py-2 mb-4 rounded-lg z-10">
+      <div className="m-3 h-[40%] rounded-2xl p-4 shadow-lg overflow-y-auto   backdrop-blur-sm relative">
+        {/* <div className="sticky top-0 bg-gray-900/80 backdrop-blur-md px-2 py-2 mb-4 rounded-lg z-10">
           <h3 className="text-white font-semibold text-sm">Lyrics</h3>
           <p className="text-white/50 text-xs">
-            {lyrics.length > 0 ? `${lyrics.length} lines` : "No lyrics available"}
+            {lyrics.length > 0
+              ? `${lyrics.length} lines`
+              : "No lyrics available"}
           </p>
-        </div>
+        </div> */}
 
         <div ref={lyricsContainerRef} className="space-y-4">
           {lyrics.length > 0 ? (
@@ -370,8 +371,8 @@ function RightSide() {
                   index === currentCueIndex
                     ? "text-white scale-105 bg-white/5"
                     : index < currentCueIndex
-                    ? "text-gray-600"
-                    : "text-gray-500"
+                      ? "text-gray-600"
+                      : "text-gray-500"
                 }`}
               >
                 {index === currentCueIndex && (
@@ -439,12 +440,15 @@ function RightSide() {
               </div>
               <div className="flex-1">
                 <div className="text-white text-sm font-semibold">
-                  {currentQuality === -1 ? "Auto Quality" : `${getQualityMeta(qualityLevels[currentQuality].bitrate).label} Quality`}
+                  {currentQuality === -1
+                    ? "Auto Quality"
+                    : `${getQualityMeta(qualityLevels[currentQuality].bitrate).label} Quality`}
                 </div>
                 <div className="text-white/50 text-xs">
                   {currentQuality === -1
                     ? "Best for your connection"
-                    : getQualityMeta(qualityLevels[currentQuality].bitrate).desc}
+                    : getQualityMeta(qualityLevels[currentQuality].bitrate)
+                        .desc}
                 </div>
               </div>
               <ChevronDown
@@ -460,7 +464,9 @@ function RightSide() {
                 <div
                   onClick={() => setQuality(-1)}
                   className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-white/5 transition-all ${
-                    currentQuality === -1 ? "bg-green-500/10 border-l-4 border-green-500" : ""
+                    currentQuality === -1
+                      ? "bg-green-500/10 border-l-4 border-green-500"
+                      : ""
                   }`}
                 >
                   <div
@@ -471,14 +477,18 @@ function RightSide() {
                     }`}
                   />
                   <div className="flex-1">
-                    <div className={`text-sm font-semibold ${currentQuality === -1 ? "text-green-500" : "text-white"}`}>
+                    <div
+                      className={`text-sm font-semibold ${currentQuality === -1 ? "text-green-500" : "text-white"}`}
+                    >
                       Auto
                     </div>
                     <div className="text-white/40 text-xs">
                       Best for your connection
                     </div>
                   </div>
-                  <div className={`text-xs font-bold px-2 py-1 rounded ${currentQuality === -1 ? "bg-green-500/20 text-green-500" : "bg-white/5 text-white/40"}`}>
+                  <div
+                    className={`text-xs font-bold px-2 py-1 rounded ${currentQuality === -1 ? "bg-green-500/20 text-green-500" : "bg-white/5 text-white/40"}`}
+                  >
                     AUTO
                   </div>
                 </div>
@@ -506,14 +516,18 @@ function RightSide() {
                           }`}
                         />
                         <div className="flex-1">
-                          <div className={`text-sm font-semibold ${currentQuality === level.index ? "text-green-500" : "text-white"}`}>
+                          <div
+                            className={`text-sm font-semibold ${currentQuality === level.index ? "text-green-500" : "text-white"}`}
+                          >
                             {meta.label}
                           </div>
                           <div className="text-white/40 text-xs">
                             {meta.desc}
                           </div>
                         </div>
-                        <div className={`text-xs font-bold px-2 py-1 rounded ${currentQuality === level.index ? "bg-green-500/20 text-green-500" : "bg-white/5 text-white/40"}`}>
+                        <div
+                          className={`text-xs font-bold px-2 py-1 rounded ${currentQuality === level.index ? "bg-green-500/20 text-green-500" : "bg-white/5 text-white/40"}`}
+                        >
                           {meta.icon}
                         </div>
                       </div>
