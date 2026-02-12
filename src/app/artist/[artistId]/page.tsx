@@ -1,5 +1,5 @@
-import SongList from "@/components/custom/SongList";
-import React from "react";
+import SongHeader from "@/components/custom/SongList";
+import SongItem from "@/components/custom/SongItem";
 import { Play, Shuffle } from "lucide-react";
 
 function Artist() {
@@ -61,7 +61,14 @@ function Artist() {
 
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6">Popular Tracks</h2>
-          <SongList songs={songs} />
+          <div className="w-full select-none">
+            <SongHeader />
+            <div className="flex flex-col space-y-1">
+              {songs.map((song, index) => (
+                <SongItem key={song.id} song={song} index={index} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
