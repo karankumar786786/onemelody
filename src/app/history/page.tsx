@@ -14,7 +14,7 @@ function Playlist() {
       {/* Content Section */}
       <div className="px-8 py-8 ">
         <div className="max-w-4xl">
-          <h1 className="text-2xl font-bold mb-4 text-zinc-300">Playlist name</h1>
+          <h1 className="text-2xl font-bold mb-4 text-zinc-300">History</h1>
         </div>
 
         <div className="mt-12">
