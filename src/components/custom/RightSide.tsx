@@ -13,6 +13,16 @@ import {
   ListPlus,
 } from "lucide-react";
 import Hls from "hls.js";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "../ui/popover";
+import { Button } from "../ui/button";
+import { useAuth } from "@clerk/nextjs";
 
 interface LyricCue {
   start: number;
@@ -50,6 +60,11 @@ function RightSide() {
   const [showQualityMenu, setShowQualityMenu] = useState<boolean>(false);
   const [currentBitrate, setCurrentBitrate] = useState<number | null>(null);
   const [status, setStatus] = useState<string>("Initializing...");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Configuration
   const baseUrl =
@@ -58,12 +73,38 @@ function RightSide() {
   const captionUrl = `${baseUrl}/captions.vtt`;
   const albumArt =
     "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png";
-
+  const songId = "wvevw";
   const songInfo = {
     title: "Aayega Maza Ab Barsaat Ka",
     artist: "Andaaz • Akshay Kumar, Priyanka Chopra",
   };
+  const { userId } = useAuth();
+  const userPlaylists = [
+    {
+      playlistId: "gnbvjvd",
+      playlistName: "silence",
+    },
+    {
+      playlistId: "gnbvjvd",
+      playlistName: "sad",
+    },
+    {
+      playlistId: "gnbvjvd",
+      playlistName: "study",
+    },
+    {
+      playlistId: "gnbvjvd",
+      playlistName: "cardio",
+    },
+  ];
 
+  const addSongInUserPlaylist = (playlistId: string) => {
+    console.table({ songId, playlistId, userId });
+  };
+
+  const addSongInUserFavouriteList = () => {
+    console.table({ userId, songId });
+  };
   // Initialize HLS player
   useEffect(() => {
     const initHLS = () => {
@@ -553,7 +594,37 @@ function RightSide() {
         {/* Playback Controls */}
 
         <div className="flex gap-6 items-center justify-center py-4 text-white">
-          <ListPlus className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors" />
+          {mounted && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="outline-none">
+                  <ListPlus className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="center">
+                <PopoverHeader>
+                  <PopoverTitle>Choose playlist</PopoverTitle>
+                  <PopoverDescription>
+                    This song will be added in the choosen playlist
+                  </PopoverDescription>
+                </PopoverHeader>
+                <div className="flex flex-col gap-2 mt-4">
+                  {userPlaylists.map((playlist, index) => (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      className="justify-start hover:bg-white/10"
+                      onClick={() => {
+                        addSongInUserPlaylist(playlist.playlistId);
+                      }}
+                    >
+                      {playlist.playlistName}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
           <SkipBack
             onClick={() => skip(-10)}
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
@@ -573,7 +644,10 @@ function RightSide() {
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
           />
           <Heart
-            onClick={() => setIsLiked(!isLiked)}
+            onClick={() => {
+              setIsLiked(!isLiked);
+              addSongInUserFavouriteList();
+            }}
             className={`w-5 h-5 cursor-pointer transition-all ${
               isLiked
                 ? "text-red-500 fill-red-500"
