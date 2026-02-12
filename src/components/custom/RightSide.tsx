@@ -61,6 +61,7 @@ function RightSide() {
   const [currentBitrate, setCurrentBitrate] = useState<number | null>(null);
   const [status, setStatus] = useState<string>("Initializing...");
   const [mounted, setMounted] = useState(false);
+  const [buffered, setBuffered] = useState<number>(0);
 
   useEffect(() => {
     setMounted(true);
@@ -114,6 +115,9 @@ function RightSide() {
         const hls = new Hls({
           enableWorker: true,
           lowLatencyMode: false,
+          maxBufferLength: 40, // Hls.js will try to keep at least 40s buffered
+          maxMaxBufferLength: 60, // Hls.js will never buffer more than 60s
+          backBufferLength: 30, // Optional: Keeps 30s of past video to allow small rewinds without re-fetching
         });
 
         hlsRef.current = hls;
@@ -266,6 +270,13 @@ function RightSide() {
       }
     };
 
+    const handleProgress = () => {
+      if (audio.buffered.length > 0) {
+        const lastBuffered = audio.buffered.end(audio.buffered.length - 1);
+        setBuffered(lastBuffered);
+      }
+    };
+
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
@@ -274,12 +285,14 @@ function RightSide() {
     const handlePause = () => setIsPlaying(false);
 
     audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("progress", handleProgress);
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
 
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("progress", handleProgress);
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
@@ -453,6 +466,12 @@ function RightSide() {
           {(() => {
             const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
             const safeProgress = isFinite(progress) ? progress : 0;
+            const bufferedProgress =
+              duration > 0 ? (buffered / duration) * 100 : 0;
+            const safeBufferedProgress = isFinite(bufferedProgress)
+              ? Math.max(safeProgress, bufferedProgress)
+              : safeProgress;
+
             return (
               <input
                 type="range"
@@ -463,7 +482,7 @@ function RightSide() {
                 className="w-full h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md hover:[&::-webkit-slider-thumb]:scale-110 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md"
                 style={
                   {
-                    "--track-bg": `linear-gradient(to right, #22c55e ${safeProgress}%, #333 ${safeProgress}%)`,
+                    "--track-bg": `linear-gradient(to right, #22c55e ${safeProgress}%, #fff ${safeProgress}%, #fff ${safeBufferedProgress}%, #333 ${safeBufferedProgress}%)`,
                   } as React.CSSProperties
                 }
               />
