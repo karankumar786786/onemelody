@@ -1,15 +1,18 @@
 import React from 'react'
 import { CheckCircle2 } from 'lucide-react'
+import Link from 'next/link';
 
 interface ArtistProps {
   name: string;
   src: string;
   bio?: string;
+  artistId: string;
 }
 
-function ArtistList({ name, src, bio = "Artist • Verified" }: ArtistProps) {
+function ArtistList({ name, src, bio = "Artist • Verified",artistId}: ArtistProps) {
   return (
     // Container: flex-row, larger padding (p-5), and rounded corners
+    <Link href={`artist/${artistId}`} >
     <div className="group flex items-center gap-6 p-5 rounded-xl hover:bg-zinc-800/40 transition-all duration-300 cursor-pointer border-b border-zinc-900/50">
       
       {/* Left Side: Circular Artist Image (Scaled up 30%) */}
@@ -35,6 +38,7 @@ function ArtistList({ name, src, bio = "Artist • Verified" }: ArtistProps) {
         </p>
       </div>
     </div>
+    </Link>
   )
 }
 

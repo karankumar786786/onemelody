@@ -19,12 +19,13 @@ function Page() {
 
         {/* List Layout (One artist per row) */}
         <div className="flex flex-col space-y-2">
-          {artistData.map((artist, i) => (
+          {artistData.map((artist, index) => (
             <ArtistList
-              key={i} 
+              key={index} 
               name={artist.name} 
               bio={artist.bio}
-              src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png" 
+              src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png"
+              artistId={`${index}`} 
             />
           ))}
         </div>

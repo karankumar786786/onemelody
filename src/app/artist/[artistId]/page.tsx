@@ -10,16 +10,19 @@ function Artist() {
       duration: "3:45",
       coverImageUrl:
         "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
-    },
-    {
-      id: 2,
-      title: "Electric Feel",
-      duration: "4:12",
-      coverImageUrl:
+        songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+        songId:"3444"
+      },
+      {
+        id: 2,
+        title: "Electric Feel",
+        duration: "4:12",
+        coverImageUrl:
         "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+        songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+        songId:"3444"
     },
   ];
-
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       {/* Hero Header Section */}

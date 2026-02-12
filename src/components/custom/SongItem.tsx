@@ -1,4 +1,4 @@
-import React from "react";
+"use client"
 import { Play } from "lucide-react";
 
 interface Song {
@@ -6,6 +6,8 @@ interface Song {
   title: string;
   duration: string;
   coverImageUrl: string;
+  songBaseUrl: string;
+  songId: string;
 }
 
 interface SongItemProps {
@@ -14,8 +16,16 @@ interface SongItemProps {
 }
 
 function SongItem({ song, index }: SongItemProps) {
+  const loadSong = (item: {
+    src: string;
+    songName: string;
+    songBaseUrl: string;
+    songId: string;
+  }) => {
+    console.table(item);
+  };
   return (
-    <div className="grid grid-cols-[16px_48px_1fr_80px] gap-4 px-4 py-2 rounded-md hover:bg-white/10 group transition-all cursor-pointer items-center">
+    <div className="grid grid-cols-[16px_48px_1fr_80px] gap-4 px-4 py-2 rounded-md hover:bg-white/10 group transition-all cursor-pointer items-center" onClick={()=>{loadSong({src:song.coverImageUrl,songName:song.title,songBaseUrl:song.songBaseUrl,songId:song.songId})}}>
       {/* Number / Play Toggle */}
       <div className="flex items-center justify-center text-zinc-500 text-sm">
         <span className="group-hover:hidden">{index + 1}</span>

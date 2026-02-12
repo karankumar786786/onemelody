@@ -21,9 +21,15 @@ import {
 import { Field, FieldGroup } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import React from "react";
 
 function Leftside() {
   const { user, isLoaded } = useUser();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const menuItems = [
     { label: "Home", icon: House, href: "/" },
@@ -40,6 +46,8 @@ function Leftside() {
     { id: 3, name: "Late Night Drive" },
     { id: 4, name: "Coding Focus" },
   ];
+
+  if (!isLoaded) return null;
 
   return (
     <div className="h-full w-[17%]  border-zinc-800 flex flex-col bg-black">
@@ -89,31 +97,35 @@ function Leftside() {
                 Your Playlists
               </h3>
             </Link>
-            <Popover>
-              <PopoverTrigger asChild>
-                <PlusSquare className="w-4 h-4 text-zinc-500 hover:text-white cursor-pointer transition-colors" />
-              </PopoverTrigger>
-              <PopoverContent className="w-80" align="start">
-                <PopoverHeader>
-                  <PopoverTitle>Create your playlist</PopoverTitle>
-                  <PopoverDescription>
-                    For uninturupted favourite songs
-                  </PopoverDescription>
-                </PopoverHeader>
-                <form
-                  action="submit"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                  }}
-                >
-                  <FieldGroup className="gap-4">
-                    <Field>playlist name</Field>
-                    <Input />
-                    <Button>Submit</Button>
-                  </FieldGroup>
-                </form>
-              </PopoverContent>
-            </Popover>
+            {mounted && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="outline-none">
+                    <PlusSquare className="w-4 h-4 text-zinc-500 hover:text-white cursor-pointer transition-colors" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="start">
+                  <PopoverHeader>
+                    <PopoverTitle>Create your playlist</PopoverTitle>
+                    <PopoverDescription>
+                      For uninturupted favourite songs
+                    </PopoverDescription>
+                  </PopoverHeader>
+                  <form
+                    action="submit"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <FieldGroup className="gap-4">
+                      <Field>playlist name</Field>
+                      <Input />
+                      <Button>Submit</Button>
+                    </FieldGroup>
+                  </form>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           <div className="space-y-1 overflow-y-auto max-h-[40vh] scrollbar-hide">

@@ -11,12 +11,13 @@ function Page() {
         {/* List Container */}
         <div className="flex flex-col border-zinc-800">
           {/* Mocking 20 items to demonstrate scrolling */}
-          {Array.from({ length: 20 }).map((_, i) => (
+          {Array.from({ length: 20 }).map((_, index) => (
             <PlaylistList 
-              key={i} 
-              name={`My Awesome Playlist #${i + 1}`} 
+              key={index} 
+              name={`My Awesome Playlist #${index + 1}`} 
               count={Math.floor(Math.random() * 100)} 
               src='https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png'
+              playlistId={`${index}`}
             />
           ))}
           

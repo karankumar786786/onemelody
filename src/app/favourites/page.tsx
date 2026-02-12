@@ -10,6 +10,9 @@ function Playlist() {
       duration: "3:45",
       coverImageUrl:
         "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+        songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+        songId:"1234"
+
     },
     {
       id: 2,
@@ -17,6 +20,8 @@ function Playlist() {
       duration: "4:12",
       coverImageUrl:
         "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+         songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+        songId:"1234"
     },
     {
       id: 3,
@@ -24,6 +29,8 @@ function Playlist() {
       duration: "3:20",
       coverImageUrl:
         "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+         songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+        songId:"1234"
     },
     {
       id: 4,
@@ -31,6 +38,8 @@ function Playlist() {
       duration: "2:58",
       coverImageUrl:
         "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+         songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+        songId:"1234"
     },
   ];
   return (

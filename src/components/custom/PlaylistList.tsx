@@ -1,16 +1,19 @@
 import React from 'react'
 import { Play } from 'lucide-react'
+import Link from 'next/link';
 
 interface PlaylistProps {
   name: string;
   count: number;
   updatedAt?: string;
-  src: string
+  src: string;
+  playlistId:string;
 }
 
-function PlaylistList({ name, count,src, updatedAt = "2 days ago" }: PlaylistProps) {
+function PlaylistList({ name, count,src, updatedAt = "2 days ago",playlistId }: PlaylistProps) {
   return (
     // Increased padding from p-3 to p-5 for a larger footprint
+    <Link href={`playlist/${playlistId}`}>
     <div className="group flex items-center justify-between p-5 rounded-xl hover:bg-zinc-800/50 transition-all duration-200 cursor-pointer border-b border-zinc-900/50">
       
       {/* Left Section: Image and Name */}
@@ -48,6 +51,7 @@ function PlaylistList({ name, count,src, updatedAt = "2 days ago" }: PlaylistPro
         </p>
       </div>
     </div>
+    </Link>
   )
 }
 
