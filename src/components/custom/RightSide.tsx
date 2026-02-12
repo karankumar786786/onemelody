@@ -10,6 +10,7 @@ import {
   Volume2,
   VolumeX,
   ChevronDown,
+  ListPlus,
 } from "lucide-react";
 import Hls from "hls.js";
 
@@ -298,7 +299,7 @@ function RightSide() {
     const kbps = Math.round(bitrate / 1000);
     if (kbps >= 100)
       return { label: "High", desc: `${kbps} kbps • Best quality`, icon: "HQ" };
-    if (kbps >= 28)
+    if (kbps >= 64)
       return { label: "Medium", desc: `${kbps} kbps • Balanced`, icon: "MQ" };
     return { label: "Low", desc: `${kbps} kbps • Data saver`, icon: "LQ" };
   };
@@ -334,7 +335,7 @@ function RightSide() {
   };
 
   return (
-    <div className=" pl-4 w-[25%]  flex flex-col  h-full overflow-hidden">
+    <div className=" pl-4 w-[25%] bg-black  flex flex-col  h-full overflow-hidden">
       {/* Hidden audio element */}
       <audio ref={audioRef} preload="metadata" />
 
@@ -408,14 +409,25 @@ function RightSide() {
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
-            value={currentTime}
-            onChange={handleSeek}
-            className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md hover:[&::-webkit-slider-thumb]:scale-110 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md"
-          />
+          {(() => {
+            const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+            const safeProgress = isFinite(progress) ? progress : 0;
+            return (
+              <input
+                type="range"
+                min="0"
+                max={duration || 0}
+                value={currentTime}
+                onChange={handleSeek}
+                className="w-full h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md hover:[&::-webkit-slider-thumb]:scale-110 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md"
+                style={
+                  {
+                    "--track-bg": `linear-gradient(to right, #22c55e ${safeProgress}%, #333 ${safeProgress}%)`,
+                  } as React.CSSProperties
+                }
+              />
+            );
+          })()}
         </div>
 
         {/* Bitrate indicator */}
@@ -539,7 +551,9 @@ function RightSide() {
         )}
 
         {/* Playback Controls */}
+
         <div className="flex gap-6 items-center justify-center py-4 text-white">
+          <ListPlus className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors" />
           <SkipBack
             onClick={() => skip(-10)}
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
@@ -570,14 +584,25 @@ function RightSide() {
 
         {/* Volume Control */}
         <div className="flex items-center gap-2 px-4 pb-4">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={isMuted ? 0 : volume}
-            onChange={handleVolumeChange}
-            className="flex-1 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md hover:[&::-webkit-slider-thumb]:scale-110 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md"
-          />
+          {(() => {
+            const volProgress = isMuted ? 0 : volume;
+            const safeVolProgress = isFinite(volProgress) ? volProgress : 0;
+            return (
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={volProgress}
+                onChange={handleVolumeChange}
+                className="flex-1 h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md hover:[&::-webkit-slider-thumb]:scale-110 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md"
+                style={
+                  {
+                    "--track-bg": `linear-gradient(to right, #22c55e ${safeVolProgress}%, #333 ${safeVolProgress}%)`,
+                  } as React.CSSProperties
+                }
+              />
+            );
+          })()}
           {isMuted || volume === 0 ? (
             <VolumeX
               onClick={toggleMute}

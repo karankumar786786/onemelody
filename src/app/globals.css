@@ -135,20 +135,27 @@
   }
 }
 
-/* Base range */
+/* Base range - removed fixed background to allow inline gradients */
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
   height: 4px;
-  background: #333;
+  background: var(--track-bg, transparent);
   border-radius: 9999px;
   outline: none;
 }
 
-/* Track fill (Chrome) */
+/* Track fill (Chrome) - uses the same variable as the input */
 input[type="range"]::-webkit-slider-runnable-track {
   height: 4px;
-  background: #333;
+  background: var(--track-bg, transparent);
+  border-radius: 9999px;
+}
+
+/* Firefox track */
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: var(--track-bg, transparent);
   border-radius: 9999px;
 }
 
@@ -157,7 +164,7 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 14px;
   width: 14px;
-  background: #22c55e;
+  background: #FFFFFF;
   border-radius: 50%;
   margin-top: -5px;
   cursor: pointer;
@@ -167,7 +174,7 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
   height: 14px;
   width: 14px;
-  background: #22c55e;
+  background: #FFFFFF;
   border: none;
   border-radius: 50%;
 }

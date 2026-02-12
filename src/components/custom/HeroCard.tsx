@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect } from 'react';
 
 export function HeroCard({
@@ -10,7 +11,7 @@ export function HeroCard({
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
-    }, 5000); // Auto-slide every 5 seconds
+    }, 9000); // Auto-slide every 5 seconds
 
     return () => clearInterval(interval);
   }, [items.length]);

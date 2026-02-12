@@ -5,7 +5,7 @@ import React from 'react';
 
 function Navbar() {
   return (
-    <nav className='h-[10vh] flex items-center justify-between px-10 '>
+    <nav className='h-[10vh] flex items-center justify-between bg-black px-10 '>
       
       
       {/* Search Bar */}
