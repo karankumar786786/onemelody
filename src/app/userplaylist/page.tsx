@@ -6,7 +6,7 @@ function Page() {
     // Fixed height (h-screen) + overflow-y-auto enables the scroll
     <div className="h-screen bg-black overflow-y-auto no-scrollbar">
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-white mb-6 tracking-tight">Playlists</h1>
+        <h1 className="text-3xl font-bold text-white mb-6 tracking-tight">Your Playlists</h1>
         
         {/* List Container */}
         <div className="flex flex-col border-zinc-800">

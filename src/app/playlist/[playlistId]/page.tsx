@@ -3,6 +3,12 @@ import React from 'react';
 import { Play, Shuffle } from 'lucide-react';
 
 function Playlist() {
+  const songs = [
+    { id: 1, title: "Midnight City", duration: "3:45", coverImageUrl: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png" },
+    { id: 2, title: "Electric Feel", duration: "4:12", coverImageUrl: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png" },
+    { id: 3, title: "Starlight", duration: "3:20", coverImageUrl: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png" },
+    { id: 4, title: "The Weekend", duration: "2:58", coverImageUrl: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png" },
+  ];
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       {/* Hero Header Section */}
@@ -36,7 +42,7 @@ function Playlist() {
 
         <div className="mt-12">
             <h2 className="text-2xl text-zinc-300 font-bold mb-6">Popular Tracks</h2>
-            <SongList />
+            <SongList songs={songs} />
         </div>
       </div>
     </div>
