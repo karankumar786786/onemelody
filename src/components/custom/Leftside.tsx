@@ -84,9 +84,11 @@ function Leftside() {
         {/* User Playlists Section */}
         <div className="flex flex-col flex-1">
           <div className="flex items-center justify-between px-3 mb-4">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-              Your Playlists
-            </h3>
+            <Link href={"/userplaylist"}>
+              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                Your Playlists
+              </h3>
+            </Link>
             <Popover>
               <PopoverTrigger asChild>
                 <PlusSquare className="w-4 h-4 text-zinc-500 hover:text-white cursor-pointer transition-colors" />
@@ -118,7 +120,7 @@ function Leftside() {
             {userPlaylists.map((playlist) => (
               <Link
                 key={playlist.id}
-                href={`/playlist/${playlist.id}`}
+                href={`/userplaylist/${playlist.id}`}
                 className="block px-3 py-1.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-md transition-colors truncate"
               >
                 {playlist.name}
