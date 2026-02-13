@@ -11,22 +11,25 @@ export default function Home() {
         <HeroCard
           items={[
             {
-              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
               songName: "Bohemian Rhapsody",
-              songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-              songId:"1899"
+              songBaseUrl:
+                "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+              songId: "1899",
             },
             {
-              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
               songName: "Stairway to Heaven",
-              songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-              songId:"1899"
+              songBaseUrl:
+                "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+              songId: "1899",
             },
             {
-              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png",
+              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
               songName: "Hotel California",
-              songBaseUrl:"https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-              songId:"1899"
+              songBaseUrl:
+                "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
+              songId: "1899",
             },
           ]}
         />
@@ -37,13 +40,13 @@ export default function Home() {
         {/* <h2 className="text-xl font-bold px-1 tracking-tight">Artists</h2> */}
         <div className="flex gap-6 overflow-x-auto no-scrollbar pb-4 p-1">
           {[...Array(11)].map((_, index) => (
-              <ArtistCard
-                key={index}
-                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/system-playlists-user_39QysGaWaslkGGJlmYOrHFreGO5-1770748000382-Screenshot+2026-02-10+at+11.23.02%E2%80%AFPM.png"
-                songBaseUrl="https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD"
-                artistId={`${index}`}
-                songName="Uchiya Lambiya"
-              />
+            <ArtistCard
+              key={index}
+              src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
+              songBaseUrl="https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD"
+              artistId={`${index}`}
+              songName="Uchiya Lambiya"
+            />
           ))}
         </div>
       </div>
@@ -56,7 +59,7 @@ export default function Home() {
             <div key={index}>
               <PlaylistCard
                 playlistId={`${index}`}
-                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png"
+                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
                 songName="uchiya lambiya"
               />
             </div>
@@ -79,7 +82,7 @@ export default function Home() {
           {[...Array(20)].map((_, index) => (
             <div key={index} className="flex justify-center">
               <SongCard
-                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png"
+                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
                 songBaseUrl="https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD"
                 songId={`${index}`}
                 songName={`Song Title ${index + 1}`}

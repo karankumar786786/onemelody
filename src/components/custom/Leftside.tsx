@@ -52,17 +52,19 @@ function Leftside() {
   return (
     <div className="h-full w-[17%]  border-zinc-800 flex flex-col bg-black">
       {/* Logo and Brand Name */}
-      <div className="flex items-center gap-3 px-6 py-6">
-        <Image
-          src={"/image.png"}
-          width={40}
-          height={40}
-          alt="One Melody Logo"
-        />
-        <div className="text-lg font-bold tracking-tighter text-white">
-          ONE MELODY
+      <Link href={"/"}>
+        <div className="flex items-center gap-3 px-6 py-6">
+          <Image
+            src={"/image.png"}
+            width={40}
+            height={40}
+            alt="One Melody Logo"
+          />
+          <div className="text-lg font-bold tracking-tighter text-white">
+            ONE MELODY
+          </div>
         </div>
-      </div>
+      </Link>
 
       <div className="flex flex-col px-3 h-full overflow-y-auto">
         {/* User Greeting */}

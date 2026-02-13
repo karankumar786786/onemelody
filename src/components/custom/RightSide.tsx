@@ -73,7 +73,7 @@ function RightSide() {
   const streamUrl = `${baseUrl}/master.m3u8`;
   const captionUrl = `${baseUrl}/captions.vtt`;
   const albumArt =
-    "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/Screenshot+2026-02-12+at+12.32.36%E2%80%AFAM.png";
+    "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png";
   const songId = "wvevw";
   const songInfo = {
     title: "Aayega Maza Ab Barsaat Ka",
