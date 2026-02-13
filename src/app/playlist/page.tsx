@@ -1,9 +1,13 @@
+"use client";
+
 import PlaylistList from "@/components/custom/PlaylistList";
 import React from "react";
+import { useAllPlaylistStore } from "@/Store/AllPlaylistStore";
 
 function Page() {
+  const playlists = useAllPlaylistStore((state) => state.playlists);
+
   return (
-    // Fixed height (h-screen) + overflow-y-auto enables the scroll
     <div className="h-screen bg-black overflow-y-auto no-scrollbar">
       <div className="p-8">
         <h1 className="text-3xl font-bold text-white mb-6 tracking-tight">
@@ -12,14 +16,13 @@ function Page() {
 
         {/* List Container */}
         <div className="flex flex-col border-zinc-800">
-          {/* Mocking 20 items to demonstrate scrolling */}
-          {Array.from({ length: 20 }).map((_, index) => (
+          {playlists.map((playlist) => (
             <PlaylistList
-              key={index}
-              name={`My Awesome Playlist #${index + 1}`}
-              count={Math.floor(Math.random() * 100)}
-              src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
-              playlistId={`${index}`}
+              key={playlist.id}
+              name={playlist.name}
+              count={playlist.count}
+              coverImageUrl={playlist.coverImageUrl}
+              id={playlist.id}
             />
           ))}
 

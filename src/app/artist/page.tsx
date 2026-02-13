@@ -1,25 +1,11 @@
+"use client";
+
 import ArtistList from "@/components/custom/AtistList";
 import React from "react";
+import { useAllArtistsStore } from "@/Store/AllArtistsStore";
 
 function Page() {
-  const artistData = [
-    {
-      name: "The Weeknd",
-      bio: "Canadian singer-songwriter known for his sonic versatility and dark lyricism.",
-    },
-    {
-      name: "Arctic Monkeys",
-      bio: "English rock band formed in Sheffield in 2002. Leading the indie rock revival.",
-    },
-    {
-      name: "Daft Punk",
-      bio: "Legendary electronic music duo known for their influence on house and synth-pop.",
-    },
-    {
-      name: "Lana Del Rey",
-      bio: "Known for her cinematic quality and exploration of tragic romance and melancholia.",
-    },
-  ];
+  const artists = useAllArtistsStore((state) => state.artists);
 
   return (
     <div className="h-screen bg-black overflow-y-auto no-scrollbar">
@@ -29,19 +15,19 @@ function Page() {
             Top Artists
           </h1>
           <span className="text-zinc-500 font-medium">
-            {artistData.length} Results
+            {artists.length} Results
           </span>
         </div>
 
         {/* List Layout (One artist per row) */}
         <div className="flex flex-col space-y-2">
-          {artistData.map((artist, index) => (
+          {artists.map((artist) => (
             <ArtistList
-              key={index}
-              name={artist.name}
-              bio={artist.bio}
-              src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
-              artistId={`${index}`}
+              key={artist.id}
+              name={artist.artistName}
+              bio={artist.bio || "Artist Bio"}
+              coverImageUrl={artist.coverImageUrl}
+              id={artist.id}
             />
           ))}
         </div>

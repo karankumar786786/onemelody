@@ -1,36 +1,30 @@
+"use client";
+
 import SongHeader from "@/components/custom/SongList";
 import SongItem from "@/components/custom/SongItem";
 import { Play, Shuffle } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useArtistSongsStore } from "@/Store/ArtistSongs";
+import { useAllArtistsStore } from "@/Store/AllArtistsStore";
+import { useShallow } from "zustand/react/shallow";
 
 function Artist() {
-  const songs = [
-    {
-      id: 1,
-      title: "Midnight City",
-      duration: "3:45",
-      coverImageUrl:
-        "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      songBaseUrl:
-        "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-      songId: "3444",
-    },
-    {
-      id: 2,
-      title: "Electric Feel",
-      duration: "4:12",
-      coverImageUrl:
-        "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      songBaseUrl:
-        "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-      songId: "3444",
-    },
-  ];
+  const { artistId } = useParams();
+  const artistSongs = useArtistSongsStore(
+    useShallow((state) => state.artistSongs[artistId as string] || []),
+  );
+  const artists = useAllArtistsStore((state) => state.artists);
+  const artist = artists.find((a) => a.id === artistId);
+
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       {/* Hero Header Section */}
       <div className="relative h-[40vh] w-full overflow-hidden group">
         <img
-          src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
+          src={
+            artist?.coverImageUrl ||
+            "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
+          }
           alt="Artist photo"
           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
         />
@@ -53,14 +47,15 @@ function Artist() {
       {/* Content Section */}
       <div className="px-8 py-8 bg-gradient-to-b from-zinc-900/50 to-black">
         <div className="max-w-4xl">
-          <h1 className="text-2xl font-bold mb-4 text-zinc-300">Artist name</h1>
+          <h1 className="text-2xl font-bold mb-4 text-zinc-300">
+            {artist?.artistName || "Artist Name"}
+          </h1>
           <h2 className="text-md font-bold mb-4 text-zinc-300">
             About the Artist
           </h2>
           <p className="text-zinc-400 leading-relaxed max-w-2xl text-sm md:text-base">
-            This is the bio of the artist. A masterful storyteller blending
-            modern rhythms with soulful melodies. Known for their unique sound
-            and captivating live performances.
+            {artist?.bio ||
+              "This is the bio of the artist. A masterful storyteller blending modern rhythms with soulful melodies."}
           </p>
         </div>
 
@@ -69,7 +64,7 @@ function Artist() {
           <div className="w-full select-none">
             <SongHeader />
             <div className="flex flex-col space-y-1">
-              {songs.map((song, index) => (
+              {artistSongs.map((song, index) => (
                 <SongItem key={song.id} song={song} index={index} />
               ))}
             </div>

@@ -5,6 +5,7 @@ import "./globals.css";
 import Leftside from "@/components/custom/Leftside";
 import RightSide from "@/components/custom/RightSide";
 import Navbar from "@/components/custom/Navbar";
+import { StoreInitializer } from "@/components/custom/StoreInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <StoreInitializer />
           <div className="flex h-screen overflow-hidden">
             <Leftside />
             <div className="flex-1 flex flex-col overflow-hidden">

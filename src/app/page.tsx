@@ -1,51 +1,36 @@
+"use client";
+
+import { useAllSongsStore } from "@/Store/AllSongsStore";
+import { useAllPlaylistStore } from "@/Store/AllPlaylistStore";
+import { useAllArtistsStore } from "@/Store/AllArtistsStore";
 import { ArtistCard } from "@/components/custom/ArtistCard";
 import { HeroCard } from "@/components/custom/HeroCard";
 import { PlaylistCard } from "@/components/custom/PlaylistCard";
 import { SongCard } from "@/components/custom/SongCard";
 
 export default function Home() {
+  const songs = useAllSongsStore((state) => state.songs);
+  const playlists = useAllPlaylistStore((state) => state.playlists);
+  const artists = useAllArtistsStore((state) => state.artists);
+
   return (
     <div className="p-4 space-y-6 bg-black">
       {/* Hero Section */}
       <div className="flex flex-col justify-center items-center">
         <HeroCard
-          items={[
-            {
-              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-              songName: "Bohemian Rhapsody",
-              songBaseUrl:
-                "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-              songId: "1899",
-            },
-            {
-              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-              songName: "Stairway to Heaven",
-              songBaseUrl:
-                "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-              songId: "1899",
-            },
-            {
-              src: "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-              songName: "Hotel California",
-              songBaseUrl:
-                "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD",
-              songId: "1899",
-            },
-          ]}
+          items={songs.slice(0, 3)} // Use first 3 songs for hero for now
         />
       </div>
 
       {/* Artists Section */}
       <div className="space-y-4">
-        {/* <h2 className="text-xl font-bold px-1 tracking-tight">Artists</h2> */}
         <div className="flex gap-6 overflow-x-auto no-scrollbar pb-4 p-1">
-          {[...Array(11)].map((_, index) => (
+          {artists.map((artist) => (
             <ArtistCard
-              key={index}
-              src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
-              songBaseUrl="https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD"
-              artistId={`${index}`}
-              songName="Uchiya Lambiya"
+              key={artist.id}
+              coverImageUrl={artist.coverImageUrl}
+              id={artist.id}
+              artistName={artist.artistName}
             />
           ))}
         </div>
@@ -53,14 +38,13 @@ export default function Home() {
 
       {/* Playlist Section */}
       <div className="space-y-3">
-        {/* <h2 className="text-xl font-semibold">Playlist</h2> */}
         <div className="flex gap-5 overflow-x-auto no-scrollbar pb-2">
-          {[...Array(11)].map((_, index) => (
-            <div key={index}>
+          {playlists.map((playlist) => (
+            <div key={playlist.id}>
               <PlaylistCard
-                playlistId={`${index}`}
-                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
-                songName="uchiya lambiya"
+                id={playlist.id}
+                coverImageUrl={playlist.coverImageUrl}
+                name={playlist.name}
               />
             </div>
           ))}
@@ -73,19 +57,14 @@ export default function Home() {
           Suggested Songs
         </h2>
 
-        {/* Grid Layout:
-            - grid-cols-2 (mobile) to grid-cols-5 (large screens)
-            - max-h-[500px] + overflow-y-auto creates the vertical scroll area
-            - pr-2 prevents the scrollbar from overlapping cards
-        */}
         <div className="grid grid-cols-2 md:grid-cols-3 no-scrollbar lg:grid-cols-4 xl:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-          {[...Array(20)].map((_, index) => (
-            <div key={index} className="flex justify-center">
+          {songs.map((song) => (
+            <div key={song.id} className="flex justify-center">
               <SongCard
-                src="https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png"
-                songBaseUrl="https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD"
-                songId={`${index}`}
-                songName={`Song Title ${index + 1}`}
+                coverImageUrl={song.coverImageUrl}
+                songBaseUrl={song.songBaseUrl}
+                id={song.id}
+                title={song.title}
               />
             </div>
           ))}

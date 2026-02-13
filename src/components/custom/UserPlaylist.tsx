@@ -10,7 +10,7 @@ interface PlaylistProps {
   id: string;
 }
 
-function PlaylistList({
+function UserPlaylist({
   name,
   count,
   coverImageUrl,
@@ -19,7 +19,7 @@ function PlaylistList({
 }: PlaylistProps) {
   return (
     // Increased padding from p-3 to p-5 for a larger footprint
-    <Link href={`/playlist/${id}`}>
+    <Link href={`/userplaylist/${id}`}>
       <div className="group flex items-center justify-between p-5 rounded-xl hover:bg-zinc-800/50 transition-all duration-200 cursor-pointer border-b border-zinc-900/50">
         {/* Left Section: Image and Name */}
         <div className="flex items-center gap-6 flex-1">
@@ -58,4 +58,4 @@ function PlaylistList({
   );
 }
 
-export default PlaylistList;
+export default UserPlaylist;

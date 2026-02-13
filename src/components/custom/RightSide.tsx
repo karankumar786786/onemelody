@@ -22,7 +22,6 @@ import {
   PopoverTrigger,
 } from "../ui/popover";
 import { Button } from "../ui/button";
-import { useAuth } from "@clerk/nextjs";
 
 interface LyricCue {
   start: number;
@@ -42,15 +41,27 @@ interface QualityMeta {
   icon: string;
 }
 
+import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
+import { useUserStore } from "@/Store/UserStore";
+import { useAllUserPlaylistStore } from "@/Store/AllUserPlaylistStore";
+
 function RightSide() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const lyricsContainerRef = useRef<HTMLDivElement>(null);
 
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
-  const [volume, setVolume] = useState<number>(100);
+  const {
+    currentSong,
+    isPlaying,
+    setIsPlaying,
+    currentTime,
+    setCurrentTime,
+    duration,
+    setDuration,
+    volume,
+    setVolume,
+  } = useCurrentlyPlayingSongsStore();
+
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [lyrics, setLyrics] = useState<LyricCue[]>([]);
   const [currentCueIndex, setCurrentCueIndex] = useState<number>(-1);
@@ -59,7 +70,6 @@ function RightSide() {
   const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
   const [showQualityMenu, setShowQualityMenu] = useState<boolean>(false);
   const [currentBitrate, setCurrentBitrate] = useState<number | null>(null);
-  const [status, setStatus] = useState<string>("Initializing...");
   const [mounted, setMounted] = useState(false);
   const [buffered, setBuffered] = useState<number>(0);
 
@@ -69,42 +79,28 @@ function RightSide() {
 
   // Configuration
   const baseUrl =
+    currentSong?.songBaseUrl ||
     "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/555cd279-546f-4833-8a4f-57662d46853b-hassena";
   const streamUrl = `${baseUrl}/master.m3u8`;
   const captionUrl = `${baseUrl}/captions.vtt`;
   const albumArt =
+    currentSong?.coverImageUrl ||
     "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png";
-  const songId = "wvevw";
+
   const songInfo = {
-    title: "Aayega Maza Ab Barsaat Ka",
-    artist: "Andaaz • Akshay Kumar, Priyanka Chopra",
+    title: currentSong?.title || "Aayega Maza Ab Barsaat Ka",
+    artist: currentSong?.artist || "Andaaz • Akshay Kumar, Priyanka Chopra",
   };
-  const { userId } = useAuth();
-  const userPlaylists = [
-    {
-      playlistId: "gnbvjvd",
-      playlistName: "silence",
-    },
-    {
-      playlistId: "gnbvjvd",
-      playlistName: "sad",
-    },
-    {
-      playlistId: "gnbvjvd",
-      playlistName: "study",
-    },
-    {
-      playlistId: "gnbvjvd",
-      playlistName: "cardio",
-    },
-  ];
+
+  const { user } = useUserStore();
+  const { userPlaylists } = useAllUserPlaylistStore();
 
   const addSongInUserPlaylist = (playlistId: string) => {
-    console.table({ songId, playlistId, userId });
+    console.table({ songId: currentSong?.id, playlistId, userId: user?.id });
   };
 
   const addSongInUserFavouriteList = () => {
-    console.table({ userId, songId });
+    console.table({ userId: user?.id, songId: currentSong?.id });
   };
   // Initialize HLS player
   useEffect(() => {
@@ -128,10 +124,21 @@ function RightSide() {
         hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
           console.log("✓ HLS loaded, quality levels:", data.levels.length);
           setQualityLevels(hls.levels as QualityLevel[]);
-          setStatus("Ready");
+          // Manifest parsed, we can now potentially play
+          if (isPlaying) {
+            audioRef.current
+              ?.play()
+              .catch((err) => console.error("Play failed:", err));
+          }
         });
 
-        // Track real-time bitrate
+        // Track real-time bitrate and duration
+        hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
+          if (data.details.totalduration) {
+            setDuration(data.details.totalduration);
+          }
+        });
+
         hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
           const level = hls.levels[data.frag.level];
           if (level) {
@@ -142,7 +149,6 @@ function RightSide() {
         hls.on(Hls.Events.ERROR, (event, data) => {
           if (data.fatal) {
             console.error("HLS Error:", data);
-            setStatus("Error");
 
             // Attempt recovery
             if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
@@ -159,9 +165,8 @@ function RightSide() {
       ) {
         // Safari native HLS
         audioRef.current.src = streamUrl;
-        setStatus("Ready (Native HLS)");
       } else {
-        setStatus("Unsupported");
+        // Unsupported
       }
     };
 
@@ -277,12 +282,17 @@ function RightSide() {
       }
     };
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
+    // const handleLoadedMetadata = () => { // This is now handled in the HLS useEffect
+    //   setDuration(audio.duration);
+    // };
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
+    const handleLoadedMetadata = () => {
+      if (audio.duration && isFinite(audio.duration)) {
+        setDuration(audio.duration);
+      }
+    };
 
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("progress", handleProgress);
@@ -297,17 +307,26 @@ function RightSide() {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [lyrics, currentCueIndex]);
+  }, [lyrics, currentCueIndex, setIsPlaying, setCurrentTime, setDuration]);
+
+  // Sync isPlaying state to audio element
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.play().catch((err) => {
+        // Only log error if it's not a user-interaction requirement error
+        if (err.name !== "NotAllowedError") {
+          console.error("Auto-play blocked or failed:", err);
+        }
+      });
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, currentSong?.id]); // Also re-play if song changes while isPlaying is true
 
   // Handle play/pause
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-    }
+    setIsPlaying(!isPlaying);
   };
 
   // Handle seek
@@ -321,10 +340,10 @@ function RightSide() {
 
   // Handle volume
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
+    const newVolume = parseFloat(e.target.value) / 100;
     setVolume(newVolume);
     if (audioRef.current) {
-      audioRef.current.volume = newVolume / 100;
+      audioRef.current.volume = newVolume;
       setIsMuted(newVolume === 0);
     }
   };
@@ -332,7 +351,7 @@ function RightSide() {
   const toggleMute = () => {
     if (audioRef.current) {
       if (isMuted) {
-        audioRef.current.volume = volume / 100;
+        audioRef.current.volume = volume;
         setIsMuted(false);
       } else {
         audioRef.current.volume = 0;
@@ -634,10 +653,10 @@ function RightSide() {
                       variant="ghost"
                       className="justify-start hover:bg-white/10"
                       onClick={() => {
-                        addSongInUserPlaylist(playlist.playlistId);
+                        addSongInUserPlaylist(playlist.id);
                       }}
                     >
-                      {playlist.playlistName}
+                      {playlist.name}
                     </Button>
                   ))}
                 </div>
@@ -678,7 +697,7 @@ function RightSide() {
         {/* Volume Control */}
         <div className="flex items-center gap-2 px-4 pb-4">
           {(() => {
-            const volProgress = isMuted ? 0 : volume;
+            const volProgress = isMuted ? 0 : volume * 100;
             const safeVolProgress = isFinite(volProgress) ? volProgress : 0;
             return (
               <input

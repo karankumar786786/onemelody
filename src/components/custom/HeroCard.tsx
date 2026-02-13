@@ -1,22 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Song } from "@/types";
+import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
 
-export function HeroCard({
-  items,
-}: {
-  items: Array<{
-    src: string;
-    songName: string;
-    songBaseUrl: string;
-    songId: string;
-  }>;
-}) {
+export function HeroCard({ items }: { items: Array<Song> }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const setCurrentSong = useCurrentlyPlayingSongsStore(
+    (state) => state.setCurrentSong,
+  );
+  const setIsPlaying = useCurrentlyPlayingSongsStore(
+    (state) => state.setIsPlaying,
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
-    }, 9000); // Auto-slide every 5 seconds
+    }, 9000);
 
     return () => clearInterval(interval);
   }, [items.length]);
@@ -35,20 +34,14 @@ export function HeroCard({
 
   if (!items.length) return null;
 
-  const loadSong = (item: {
-    src: string;
-    songName: string;
-    songBaseUrl: string;
-    songId: string;
-  }) => {
-    console.table(item);
+  const loadSong = (song: Song) => {
+    setCurrentSong(song);
+    setIsPlaying(true);
   };
 
   return (
     <div className="w-[95%] group cursor-pointer relative">
-      {/* Main Carousel */}
       <div className="relative overflow-hidden rounded-md shadow-md">
-        {/* Images Container */}
         <div
           className="flex transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -62,17 +55,15 @@ export function HeroCard({
               }}
             >
               <img
-                src={item.src}
-                alt={item.songName}
+                src={item.coverImageUrl}
+                alt={item.title}
                 className="w-full h-[240px] md:h-[305px] lg:h-[370px] object-cover"
               />
-              {/* Gradient Overlay - Only visible on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-              {/* Song Info - Only visible on hover */}
               <div className="absolute bottom-0 left-0 right-0 p-2.5 md:p-4 lg:p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <h2 className="text-white font-bold text-base md:text-xl lg:text-2xl drop-shadow-2xl mb-0.5">
-                  {item.songName}
+                  {item.title}
                 </h2>
                 <div className="h-0.5 w-10 bg-white/80 rounded-full" />
               </div>
@@ -80,7 +71,6 @@ export function HeroCard({
           ))}
         </div>
 
-        {/* Navigation Arrows */}
         <button
           onClick={goToPrevious}
           className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
@@ -121,7 +111,6 @@ export function HeroCard({
         </button>
       </div>
 
-      {/* Dot Indicators */}
       <div className="flex justify-center gap-1 mt-1.5">
         {items.map((_, index) => (
           <button

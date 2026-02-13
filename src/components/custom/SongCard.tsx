@@ -1,40 +1,45 @@
-"use client"
+import { Song } from "@/types";
+import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
+
 export function SongCard({
-  src,
-  songName,
+  coverImageUrl,
+  title,
   songBaseUrl,
-  songId,
+  id,
 }: {
-  src: string;
-  songName: string;
+  coverImageUrl: string;
+  title: string;
   songBaseUrl: string;
-  songId: string;
+  id: string;
 }) {
-  const loadSong = (item: {
-    src: string;
-    songName: string;
-    songBaseUrl: string;
-    songId: string;
-  }) => {
-    console.table(item);
+  const setCurrentSong = useCurrentlyPlayingSongsStore(
+    (state) => state.setCurrentSong,
+  );
+  const setIsPlaying = useCurrentlyPlayingSongsStore(
+    (state) => state.setIsPlaying,
+  );
+
+  const loadSong = () => {
+    const song: Song = {
+      id,
+      title,
+      artist: "Single • 2024", // Placeholder for now
+      coverImageUrl,
+      songBaseUrl,
+    };
+    setCurrentSong(song);
+    setIsPlaying(true);
   };
+
   return (
-    // Standardizing to w-40 (10rem) to prevent non-standard sizing issues
-    <div
-      className="w-40 group cursor-pointer flex flex-col"
-      onClick={() => {
-        loadSong({ src, songName, songBaseUrl, songId });
-      }}
-    >
+    <div className="w-40 group cursor-pointer flex flex-col" onClick={loadSong}>
       <div className="relative aspect-square overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
         <img
-          src={src}
-          alt={songName}
-          // object-cover ensures the album art fills the square perfectly
+          src={coverImageUrl}
+          alt={title}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
         />
 
-        {/* Play Button Overlay: A standard UX cue for songs */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           <div className="bg-white/20 backdrop-blur-md p-3 rounded-full border border-white/30 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
             <svg
@@ -47,10 +52,9 @@ export function SongCard({
         </div>
       </div>
 
-      {/* Song Details below the image for better readability */}
       <div className="mt-3 px-1">
         <h3 className="text-white font-semibold text-sm truncate leading-tight">
-          {songName}
+          {title}
         </h3>
         <p className="text-zinc-400 text-xs mt-1 truncate">Single • 2024</p>
       </div>
