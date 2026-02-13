@@ -69,7 +69,7 @@ function RightSide() {
 
   // Configuration
   const baseUrl =
-    "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/Aayega-Maza-Ab-Barsaat-Ka--Andaaz---Akshay-Kumar---Priyanka-Chopra---Lara-Dutta---Romantic-Hindi--HD";
+    "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/555cd279-546f-4833-8a4f-57662d46853b-hassena";
   const streamUrl = `${baseUrl}/master.m3u8`;
   const captionUrl = `${baseUrl}/captions.vtt`;
   const albumArt =
