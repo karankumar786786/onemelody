@@ -21,11 +21,18 @@ import {
 import { Field, FieldGroup } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import React from "react";
+import React, { useState } from "react";
+import { useAllUserPlaylistStore } from "@/Store/AllUserPlaylistStore";
+import { createUserPlaylist } from "@/app/server/createUserPlaylist";
 
 function Leftside() {
   const { user, isLoaded } = useUser();
   const [mounted, setMounted] = React.useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const { userPlaylists, addUserPlaylist } = useAllUserPlaylistStore();
 
   React.useEffect(() => {
     setMounted(true);
@@ -39,13 +46,33 @@ function Leftside() {
     { label: "History", icon: History, href: "/history" },
   ];
 
-  // Mock data - replace with your actual DB fetch later
-  const userPlaylists = [
-    { id: 1, name: "Chill Lo-fi Beats" },
-    { id: 2, name: "Workout Energy" },
-    { id: 3, name: "Late Night Drive" },
-    { id: 4, name: "Coding Focus" },
-  ];
+  const handleCreatePlaylist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPlaylistName.trim()) return;
+
+    setIsCreating(true);
+    try {
+      const result = await createUserPlaylist(newPlaylistName);
+      if (result.success && result.data) {
+        // Map backend data to frontend Playlist type
+        addUserPlaylist({
+          id: result.data.id.toString(),
+          name: result.data.playlist_name,
+          count: 0,
+          coverImageUrl: "",
+        });
+        setNewPlaylistName("");
+        setIsPopoverOpen(false);
+        // console.log("Playlist created successfully");
+      } else {
+        console.error("Failed to create playlist:", result.error);
+      }
+    } catch (error) {
+      console.error("Error creating playlist:", error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   if (!isLoaded) return null;
 
@@ -100,7 +127,7 @@ function Leftside() {
               </h3>
             </Link>
             {mounted && (
-              <Popover>
+              <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                 <PopoverTrigger asChild>
                   <button className="outline-none">
                     <PlusSquare className="w-4 h-4 text-zinc-500 hover:text-white cursor-pointer transition-colors" />
@@ -113,16 +140,21 @@ function Leftside() {
                       For uninturupted favourite songs
                     </PopoverDescription>
                   </PopoverHeader>
-                  <form
-                    action="submit"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                    }}
-                  >
+                  <form onSubmit={handleCreatePlaylist}>
                     <FieldGroup className="gap-4">
                       <Field>playlist name</Field>
-                      <Input />
-                      <Button>Submit</Button>
+                      <Input
+                        value={newPlaylistName}
+                        onChange={(e) => setNewPlaylistName(e.target.value)}
+                        placeholder="My Awesome Playlist"
+                        disabled={isCreating}
+                      />
+                      <Button
+                        type="submit"
+                        disabled={isCreating || !newPlaylistName.trim()}
+                      >
+                        {isCreating ? "Creating..." : "Submit"}
+                      </Button>
                     </FieldGroup>
                   </form>
                 </PopoverContent>

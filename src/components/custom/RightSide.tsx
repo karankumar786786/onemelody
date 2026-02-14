@@ -44,11 +44,18 @@ interface QualityMeta {
 import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
 import { useUserStore } from "@/Store/UserStore";
 import { useAllUserPlaylistStore } from "@/Store/AllUserPlaylistStore";
+import { useUserFavouriteSongsStore } from "@/Store/UserFavouriteSongsStore";
+import { useUserHistorySongsStore } from "@/Store/UserHistorySongsStore";
+import { addSongInUserFavourites } from "@/app/server/addSongInUserFavourites";
+import { deleteUserFavouriteSong } from "@/app/server/deleteUserFavouriteSong";
+import { checkSongInUserFavourites } from "@/app/server/checkSongInUserFavourites";
+import { addSongToUserHistory } from "@/app/server/addSongToUserHistory";
 
 function RightSide() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const lyricsContainerRef = useRef<HTMLDivElement>(null);
+  const hasTrackedPlayRef = useRef(false);
 
   const {
     currentSong,
@@ -99,9 +106,44 @@ function RightSide() {
     console.table({ songId: currentSong?.id, playlistId, userId: user?.id });
   };
 
-  const addSongInUserFavouriteList = () => {
-    console.table({ userId: user?.id, songId: currentSong?.id });
+  const addSongInUserFavouriteList = async () => {
+    if (!currentSong) return;
+    const songId = parseInt(currentSong.id);
+    const toggleFavouriteInStore =
+      useUserFavouriteSongsStore.getState().toggleFavourite;
+
+    try {
+      if (isLiked) {
+        const result = await deleteUserFavouriteSong(songId);
+        if (result.success) {
+          setIsLiked(false);
+          toggleFavouriteInStore(currentSong);
+        }
+      } else {
+        const result = await addSongInUserFavourites(songId);
+        if (result.success) {
+          setIsLiked(true);
+          toggleFavouriteInStore(currentSong);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
   };
+
+  // Check if current song is in favorites
+  useEffect(() => {
+    const checkFavorite = async () => {
+      if (currentSong) {
+        const isFav = await checkSongInUserFavourites(parseInt(currentSong.id));
+        setIsLiked(isFav);
+      }
+    };
+    checkFavorite();
+    // Reset history tracking for new song
+    hasTrackedPlayRef.current = false;
+  }, [currentSong?.id]);
+
   // Initialize HLS player
   useEffect(() => {
     const initHLS = () => {
@@ -286,7 +328,19 @@ function RightSide() {
     //   setDuration(audio.duration);
     // };
 
-    const handlePlay = () => setIsPlaying(true);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      // Track history when song starts playing
+      if (currentSong && !hasTrackedPlayRef.current) {
+        addSongToUserHistory(parseInt(currentSong.id)).then((res) => {
+          if (res.success) {
+            useUserHistorySongsStore.getState().addToHistory(currentSong);
+            hasTrackedPlayRef.current = true;
+          }
+        });
+      }
+    };
+
     const handlePause = () => setIsPlaying(false);
     const handleLoadedMetadata = () => {
       if (audio.duration && isFinite(audio.duration)) {
