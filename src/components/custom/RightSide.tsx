@@ -96,14 +96,30 @@ function RightSide() {
   const { songs } = useAllSongsStore();
   const { user } = useUserStore();
   const { userPlaylists } = useAllUserPlaylistStore();
+  const { historySongs } = useUserHistorySongsStore();
 
-  const playRandomSong = () => {
+  const playRandomSong = (autoPlay: boolean | unknown = true) => {
     if (songs.length > 0) {
       const randomIndex = Math.floor(Math.random() * songs.length);
       useCurrentlyPlayingSongsStore
         .getState()
         .setCurrentSong(songs[randomIndex]);
+      if (typeof autoPlay === "boolean" ? autoPlay : true) {
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const playPreviousSong = () => {
+    // historySongs[0] is the current song (if playing/tracked)
+    // historySongs[1] is the previous song
+    if (historySongs.length > 1) {
+      const previousSong = historySongs[1];
+      useCurrentlyPlayingSongsStore.getState().setCurrentSong(previousSong);
       setIsPlaying(true);
+    } else {
+      // Fallback to random if no history
+      playRandomSong();
     }
   };
 
@@ -112,7 +128,7 @@ function RightSide() {
 
     // Auto-play random song if none selected
     if (!currentSong && songs.length > 0) {
-      playRandomSong();
+      playRandomSong(false);
     }
   }, [currentSong, songs]);
 
@@ -464,6 +480,10 @@ function RightSide() {
         // Only log error if it's not a user-interaction requirement error or an interruption
         if (err.name !== "NotAllowedError" && err.name !== "AbortError") {
           console.error("Auto-play blocked or failed:", err);
+        }
+        // If prevented, sync state back to false so user sees play button
+        if (err.name === "NotAllowedError") {
+          setIsPlaying(false);
         }
       });
     } else {
@@ -823,7 +843,7 @@ function RightSide() {
             </Popover>
           )}
           <SkipBack
-            onClick={playRandomSong}
+            onClick={playPreviousSong}
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
           />
           <div
