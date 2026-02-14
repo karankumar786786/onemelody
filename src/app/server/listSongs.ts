@@ -13,7 +13,8 @@ export async function listAllSongs() {
             language,
             artist_stage_name,
             created_at
-        `).order('created_at', { ascending: false });
+        `)
+        .eq("processing",false).order('created_at', { ascending: false });
 
         if (error) {
             console.error("Supabase List Songs Error:", error);

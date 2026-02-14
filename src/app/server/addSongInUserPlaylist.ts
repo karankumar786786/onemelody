@@ -4,12 +4,16 @@ import { client } from "@/lib/supabase";
 export async function addSongInUserPlaylist(playlistId: number, songId: number) {
     try {
         // Check if already exists to prevent duplicates
-        const { data: existing } = await client
+        const { data: existing, error: checkError } = await client
             .from("user_playlist_songs")
             .select("id")
             .eq('playlistId', playlistId)
             .eq('songId', songId)
-            .single();
+            .maybeSingle();
+
+        if (checkError) {
+            console.error("Error checking existence:", checkError);
+        }
 
         if (existing) {
             return { success: true, message: "Song already in playlist" };
@@ -18,8 +22,8 @@ export async function addSongInUserPlaylist(playlistId: number, songId: number) 
         const { data, error } = await client
             .from("user_playlist_songs")
             .insert({
-                playlistId,
-                songId
+                playlistId: playlistId,
+                songId: songId
             })
             .select()
             .single();

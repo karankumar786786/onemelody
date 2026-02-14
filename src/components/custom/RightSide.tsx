@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import {
   Play,
   Pause,
@@ -83,8 +84,13 @@ function RightSide() {
   const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
   const [showQualityMenu, setShowQualityMenu] = useState<boolean>(false);
   const [currentBitrate, setCurrentBitrate] = useState<number | null>(null);
+
+  // ... existing imports ...
+
   const [mounted, setMounted] = useState(false);
   const [buffered, setBuffered] = useState<number>(0);
+  const [isPlaylistPopoverOpen, setIsPlaylistPopoverOpen] = useState(false);
+  const [addingToPlaylist, setAddingToPlaylist] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -108,24 +114,38 @@ function RightSide() {
   const { user } = useUserStore();
   const { userPlaylists } = useAllUserPlaylistStore();
 
-  const addSongInUserPlaylist = async (playlistId: string) => {
+  const addSongInUserPlaylist = async (
+    playlistId: string,
+    playlistName: string,
+  ) => {
     if (!currentSong) return;
+
+    setAddingToPlaylist(playlistId);
     const songId = parseInt(currentSong.id);
     const pId = parseInt(playlistId);
 
     try {
       const result = await addSongToPlaylistAction(pId, songId);
+
       if (result.success) {
-        // Update store if needed (this store is usually loaded when opening the playlist page)
-        const addSongToStore =
-          useAllUserPlaylistSongsStore.getState().addSongToUserPlaylist;
-        addSongToStore(playlistId, currentSong);
-        alert(`Successfully added "${currentSong.title}" to playlist!`);
+        if (result.message === "Song already in playlist") {
+          toast.info(`"${currentSong.title}" is already in "${playlistName}"`);
+        } else {
+          // Update store if needed (this store is usually loaded when opening the playlist page)
+          const addSongToStore =
+            useAllUserPlaylistSongsStore.getState().addSongToUserPlaylist;
+          addSongToStore(playlistId, currentSong);
+          toast.success(`Added "${currentSong.title}" to "${playlistName}"`);
+        }
+        setIsPlaylistPopoverOpen(false);
       } else {
-        alert(`Failed to add song: ${result.error}`);
+        toast.error(`Failed to add song: ${result.error}`);
       }
     } catch (error) {
       console.error("Error adding song to playlist:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setAddingToPlaylist(null);
     }
   };
 
@@ -732,7 +752,10 @@ function RightSide() {
 
         <div className="flex gap-6 items-center justify-center py-4 text-white">
           {mounted && (
-            <Popover>
+            <Popover
+              open={isPlaylistPopoverOpen}
+              onOpenChange={setIsPlaylistPopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <button className="outline-none">
                   <ListPlus className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors" />
@@ -752,7 +775,7 @@ function RightSide() {
                       variant="ghost"
                       className="justify-start hover:bg-white/10"
                       onClick={() => {
-                        addSongInUserPlaylist(playlist.id);
+                        addSongInUserPlaylist(playlist.id, playlist.name);
                       }}
                     >
                       {playlist.name}
