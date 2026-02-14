@@ -80,7 +80,7 @@ function RightSide() {
   // Configuration
   const baseUrl =
     currentSong?.songBaseUrl ||
-    "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/555cd279-546f-4833-8a4f-57662d46853b-hassena";
+    "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/8ac1b039-b782-46e2-b94b-ddb4f5ae93bd";
   const streamUrl = `${baseUrl}/master.m3u8`;
   const captionUrl = `${baseUrl}/captions.vtt`;
   const albumArt =
@@ -314,15 +314,15 @@ function RightSide() {
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.play().catch((err) => {
-        // Only log error if it's not a user-interaction requirement error
-        if (err.name !== "NotAllowedError") {
+        // Only log error if it's not a user-interaction requirement error or an interruption
+        if (err.name !== "NotAllowedError" && err.name !== "AbortError") {
           console.error("Auto-play blocked or failed:", err);
         }
       });
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, currentSong?.id]); // Also re-play if song changes while isPlaying is true
+  }, [isPlaying]); // Removed currentSong?.id to avoid redundant play() calls during HLS load
 
   // Handle play/pause
   const togglePlay = () => {
