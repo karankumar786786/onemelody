@@ -43,6 +43,7 @@ interface QualityMeta {
 }
 
 import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
+import { useAllSongsStore } from "@/Store/AllSongsStore";
 import { useUserStore } from "@/Store/UserStore";
 import { useAllUserPlaylistStore } from "@/Store/AllUserPlaylistStore";
 import { useUserFavouriteSongsStore } from "@/Store/UserFavouriteSongsStore";
@@ -92,27 +93,34 @@ function RightSide() {
   const [isPlaylistPopoverOpen, setIsPlaylistPopoverOpen] = useState(false);
   const [addingToPlaylist, setAddingToPlaylist] = useState<string | null>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Configuration
-  const baseUrl =
-    currentSong?.songBaseUrl ||
-    "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/8ac1b039-b782-46e2-b94b-ddb4f5ae93bd";
-  const streamUrl = `${baseUrl}/master.m3u8`;
-  const captionUrl = `${baseUrl}/captions.vtt`;
-  const albumArt =
-    currentSong?.coverImageUrl ||
-    "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png";
-
-  const songInfo = {
-    title: currentSong?.title || "Aayega Maza Ab Barsaat Ka",
-    artist: currentSong?.artist || "Andaaz • Akshay Kumar, Priyanka Chopra",
-  };
-
+  const { songs } = useAllSongsStore();
   const { user } = useUserStore();
   const { userPlaylists } = useAllUserPlaylistStore();
+
+  useEffect(() => {
+    setMounted(true);
+
+    // Auto-play random song if none selected
+    if (!currentSong && songs.length > 0) {
+      const randomIndex = Math.floor(Math.random() * songs.length);
+      useCurrentlyPlayingSongsStore
+        .getState()
+        .setCurrentSong(songs[randomIndex]);
+    }
+  }, [currentSong, songs]);
+
+  // Configuration - Dynamic Only
+  /* Early return removed to fix hooks ordering */
+
+  const baseUrl = currentSong?.songBaseUrl || "";
+  const streamUrl = currentSong ? `${baseUrl}/master.m3u8` : "";
+  const captionUrl = currentSong ? `${baseUrl}/captions.vtt` : "";
+  const albumArt = currentSong?.coverImageUrl || "";
+
+  const songInfo = {
+    title: currentSong?.title || "",
+    artist: currentSong?.artist || "",
+  };
 
   const addSongInUserPlaylist = async (
     playlistId: string,
@@ -212,7 +220,7 @@ function RightSide() {
   // Initialize HLS player
   useEffect(() => {
     const initHLS = () => {
-      if (!audioRef.current) return;
+      if (!audioRef.current || !streamUrl) return;
 
       if (Hls.isSupported()) {
         const hls = new Hls({
@@ -289,6 +297,10 @@ function RightSide() {
   // Load captions/lyrics
   useEffect(() => {
     const loadLyrics = async () => {
+      if (!captionUrl) {
+        setLyrics([]);
+        return;
+      }
       try {
         const response = await fetch(captionUrl);
 
@@ -525,6 +537,15 @@ function RightSide() {
     }
     return "AUTO";
   };
+
+  if (!currentSong) {
+    if (!mounted) return null;
+    return (
+      <div className="pl-4 w-[25%] bg-black flex flex-col h-full items-center justify-center text-white/50">
+        <p>Select a song to play</p>
+      </div>
+    );
+  }
 
   return (
     <div className=" pl-4 w-[25%] bg-black  flex flex-col  h-full overflow-hidden">
