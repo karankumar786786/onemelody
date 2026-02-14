@@ -10,6 +10,8 @@ import { useShallow } from "zustand/react/shallow";
 import { useEffect } from "react";
 import { listSongsByArtistId } from "@/app/server/listSongsByArtistId";
 
+import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
+
 function Artist() {
   const { artistId } = useParams();
   const setArtistSongs = useArtistSongsStore((state) => state.setArtistSongs);
@@ -18,6 +20,25 @@ function Artist() {
   );
   const artists = useAllArtistsStore((state) => state.artists);
   const artist = artists.find((a) => a.id === artistId);
+  const { setQueue, setCurrentSong, setIsPlaying } =
+    useCurrentlyPlayingSongsStore();
+
+  const handlePlay = () => {
+    if (artistSongs.length > 0) {
+      setQueue(artistSongs);
+      setCurrentSong(artistSongs[0]);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleShuffle = () => {
+    if (artistSongs.length > 0) {
+      const shuffledSongs = [...artistSongs].sort(() => Math.random() - 0.5);
+      setQueue(shuffledSongs);
+      setCurrentSong(shuffledSongs[0]);
+      setIsPlaying(true);
+    }
+  };
 
   useEffect(() => {
     if (artist?.artistName) {
@@ -55,10 +76,16 @@ function Artist() {
         {/* Artist Info Overlay */}
         <div className="absolute bottom-0 left-0 p-8 w-full">
           <div className="flex items-center gap-4">
-            <button className="bg-green-500 hover:bg-white text-black p-4 rounded-full transition-transform active:scale-95">
+            <button
+              onClick={handlePlay}
+              className="bg-green-500 hover:bg-white text-black p-4 rounded-full transition-transform active:scale-95"
+            >
               <Play fill="black" size={24} />
             </button>
-            <button className="border border-zinc-700 hover:border-white p-3 rounded-full transition-colors">
+            <button
+              onClick={handleShuffle}
+              className="border border-zinc-700 hover:border-white p-3 rounded-full transition-colors"
+            >
               <Shuffle size={20} />
             </button>
           </div>

@@ -7,6 +7,7 @@ import { Play, Shuffle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useAllPlaylistSongsStore } from "@/Store/PlaylistSongs";
 import { useAllPlaylistStore } from "@/Store/AllPlaylistStore";
+import { useCurrentlyPlayingSongsStore } from "@/Store/CurrentlyPlayingSongsStore";
 import { useShallow } from "zustand/react/shallow";
 import { useEffect } from "react";
 import { listSongsByPlaylistId } from "@/app/server/listSongsByPlaylistId";
@@ -21,6 +22,25 @@ function Playlist() {
   );
   const playlists = useAllPlaylistStore((state) => state.playlists);
   const playlist = playlists.find((p) => p.id === playlistId);
+  const { setQueue, setCurrentSong, setIsPlaying } =
+    useCurrentlyPlayingSongsStore();
+
+  const handlePlay = () => {
+    if (playlistSongs.length > 0) {
+      setQueue(playlistSongs);
+      setCurrentSong(playlistSongs[0]);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleShuffle = () => {
+    if (playlistSongs.length > 0) {
+      const shuffledSongs = [...playlistSongs].sort(() => Math.random() - 0.5);
+      setQueue(shuffledSongs);
+      setCurrentSong(shuffledSongs[0]);
+      setIsPlaying(true);
+    }
+  };
 
   useEffect(() => {
     if (playlistId) {
@@ -58,10 +78,16 @@ function Playlist() {
         {/* Playlist Info Overlay */}
         <div className="absolute bottom-0 left-0 p-8 w-full">
           <div className="flex items-center gap-4">
-            <button className="bg-green-500 hover:bg-white text-black p-4 rounded-full transition-transform active:scale-95">
+            <button
+              onClick={handlePlay}
+              className="bg-green-500 hover:bg-white text-black p-4 rounded-full transition-transform active:scale-95"
+            >
               <Play fill="black" size={24} />
             </button>
-            <button className="border border-zinc-700 hover:border-white p-3 rounded-full transition-colors">
+            <button
+              onClick={handleShuffle}
+              className="border border-zinc-700 hover:border-white p-3 rounded-full transition-colors"
+            >
               <Shuffle size={20} />
             </button>
           </div>

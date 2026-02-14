@@ -43,7 +43,7 @@ function PlaylistList({
               {name}
             </h3>
             {/* Increased font from text-xs to text-sm */}
-            <p className="text-zinc-500 text-sm font-medium">{count} Tracks</p>
+            {/* <p className="text-zinc-500 text-sm font-medium">{count} Tracks</p> */}
           </div>
         </div>
 

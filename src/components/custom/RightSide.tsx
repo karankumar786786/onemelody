@@ -71,6 +71,7 @@ function RightSide() {
     setDuration,
     volume,
     setVolume,
+    queue,
   } = useCurrentlyPlayingSongsStore();
 
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -110,7 +111,34 @@ function RightSide() {
     }
   };
 
+  const playNextSong = () => {
+    if (queue.length > 0 && currentSong) {
+      const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
+      if (currentIndex !== -1 && currentIndex < queue.length - 1) {
+        useCurrentlyPlayingSongsStore
+          .getState()
+          .setCurrentSong(queue[currentIndex + 1]);
+        setIsPlaying(true);
+        return;
+      }
+    }
+    // Fallback if no queue or end of queue
+    playRandomSong();
+  };
+
   const playPreviousSong = () => {
+    if (queue.length > 0 && currentSong) {
+      const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
+      if (currentIndex > 0) {
+        useCurrentlyPlayingSongsStore
+          .getState()
+          .setCurrentSong(queue[currentIndex - 1]);
+        setIsPlaying(true);
+        return;
+      }
+    }
+
+    // Fallback to history
     // historySongs[0] is the current song (if playing/tracked)
     // historySongs[1] is the previous song
     if (historySongs.length > 1) {
@@ -453,7 +481,7 @@ function RightSide() {
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
-    audio.addEventListener("ended", playRandomSong);
+    audio.addEventListener("ended", playNextSong);
 
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
@@ -461,7 +489,7 @@ function RightSide() {
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("ended", playRandomSong);
+      audio.removeEventListener("ended", playNextSong);
     };
   }, [
     lyrics,
@@ -469,7 +497,9 @@ function RightSide() {
     setIsPlaying,
     setCurrentTime,
     setDuration,
-    playRandomSong,
+    setCurrentTime,
+    setDuration,
+    playNextSong,
   ]);
 
   // Sync isPlaying state to audio element
@@ -857,7 +887,7 @@ function RightSide() {
             )}
           </div>
           <SkipForward
-            onClick={playRandomSong}
+            onClick={playNextSong}
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
           />
           <Heart
