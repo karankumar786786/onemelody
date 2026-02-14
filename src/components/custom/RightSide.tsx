@@ -50,6 +50,8 @@ import { addSongInUserFavourites } from "@/app/server/addSongInUserFavourites";
 import { deleteUserFavouriteSong } from "@/app/server/deleteUserFavouriteSong";
 import { checkSongInUserFavourites } from "@/app/server/checkSongInUserFavourites";
 import { addSongToUserHistory } from "@/app/server/addSongToUserHistory";
+import { addSongInUserPlaylist as addSongToPlaylistAction } from "@/app/server/addSongInUserPlaylist";
+import { useAllUserPlaylistSongsStore } from "@/Store/UserPlaylistSongs";
 
 function RightSide() {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -72,7 +74,11 @@ function RightSide() {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [lyrics, setLyrics] = useState<LyricCue[]>([]);
   const [currentCueIndex, setCurrentCueIndex] = useState<number>(-1);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const { favouriteSongs, addFavourite, removeFavourite } =
+    useUserFavouriteSongsStore();
+  const isLiked = currentSong
+    ? favouriteSongs.some((s) => s.id === currentSong.id)
+    : false;
   const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([]);
   const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
   const [showQualityMenu, setShowQualityMenu] = useState<boolean>(false);
@@ -102,41 +108,80 @@ function RightSide() {
   const { user } = useUserStore();
   const { userPlaylists } = useAllUserPlaylistStore();
 
-  const addSongInUserPlaylist = (playlistId: string) => {
-    console.table({ songId: currentSong?.id, playlistId, userId: user?.id });
-  };
-
-  const addSongInUserFavouriteList = async () => {
+  const addSongInUserPlaylist = async (playlistId: string) => {
     if (!currentSong) return;
     const songId = parseInt(currentSong.id);
-    const toggleFavouriteInStore =
-      useUserFavouriteSongsStore.getState().toggleFavourite;
+    const pId = parseInt(playlistId);
 
     try {
-      if (isLiked) {
-        const result = await deleteUserFavouriteSong(songId);
-        if (result.success) {
-          setIsLiked(false);
-          toggleFavouriteInStore(currentSong);
-        }
+      const result = await addSongToPlaylistAction(pId, songId);
+      if (result.success) {
+        // Update store if needed (this store is usually loaded when opening the playlist page)
+        const addSongToStore =
+          useAllUserPlaylistSongsStore.getState().addSongToUserPlaylist;
+        addSongToStore(playlistId, currentSong);
+        alert(`Successfully added "${currentSong.title}" to playlist!`);
       } else {
-        const result = await addSongInUserFavourites(songId);
-        if (result.success) {
-          setIsLiked(true);
-          toggleFavouriteInStore(currentSong);
-        }
+        alert(`Failed to add song: ${result.error}`);
       }
     } catch (error) {
-      console.error("Failed to toggle favorite:", error);
+      console.error("Error adding song to playlist:", error);
     }
   };
 
-  // Check if current song is in favorites
+  const handleToggleFavourite = async () => {
+    if (!currentSong) return;
+    const songId = parseInt(currentSong.id);
+
+    if (isLiked) {
+      // Optimistic Remove
+      removeFavourite(currentSong.id);
+
+      try {
+        const result = await deleteUserFavouriteSong(songId);
+        if (!result.success) {
+          // Revert if failed
+          addFavourite(currentSong);
+          console.error("Failed to remove favorite:", result.error);
+        }
+      } catch (error) {
+        addFavourite(currentSong);
+        console.error("Error removing favorite:", error);
+      }
+    } else {
+      // Optimistic Add
+      addFavourite(currentSong);
+
+      try {
+        const result = await addSongInUserFavourites(songId);
+        if (!result.success) {
+          // Revert if failed
+          removeFavourite(currentSong.id);
+          console.error("Failed to add favorite:", result.error);
+        }
+      } catch (error) {
+        removeFavourite(currentSong.id);
+        console.error("Error adding favorite:", error);
+      }
+    }
+  };
+
+  // Check if current song is in favorites and sync store
   useEffect(() => {
     const checkFavorite = async () => {
       if (currentSong) {
-        const isFav = await checkSongInUserFavourites(parseInt(currentSong.id));
-        setIsLiked(isFav);
+        try {
+          const isFav = await checkSongInUserFavourites(
+            parseInt(currentSong.id),
+          );
+          if (isFav && !isLiked) {
+            addFavourite(currentSong);
+          } else if (!isFav && isLiked) {
+            removeFavourite(currentSong.id);
+          }
+        } catch (error) {
+          console.error("Error checking favorite status:", error);
+        }
       }
     };
     checkFavorite();
@@ -736,10 +781,7 @@ function RightSide() {
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
           />
           <Heart
-            onClick={() => {
-              setIsLiked(!isLiked);
-              addSongInUserFavouriteList();
-            }}
+            onClick={handleToggleFavourite}
             className={`w-5 h-5 cursor-pointer transition-all ${
               isLiked
                 ? "text-red-500 fill-red-500"
