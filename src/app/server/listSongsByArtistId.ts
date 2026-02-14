@@ -16,7 +16,7 @@ export async function listSongsByArtistId(artistId: string) {
                 artist_stage_name,
                 created_at
             `)
-            .eq('id', artistId)
+            .eq('artist_stage_name', artistId)
             .order('created_at', { ascending: false });
 
         if (error) {

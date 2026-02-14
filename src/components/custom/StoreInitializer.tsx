@@ -11,7 +11,12 @@ import { useAllUserPlaylistSongsStore } from "@/Store/UserPlaylistSongs";
 import { useUserFavouriteSongsStore } from "@/Store/UserFavouriteSongsStore";
 import { useUserHistorySongsStore } from "@/Store/UserHistorySongsStore";
 import { useUserStore } from "@/Store/UserStore";
-import { Artist, Playlist, Song } from "@/types";
+import { listAllSongs } from "@/app/server/listSongs";
+import { listAllArtists } from "@/app/server/listArtists";
+import { listSystemPlaylists } from "@/app/server/listSystemPlaylists";
+import { listUserPlaylists } from "@/app/server/listUserPlaylists";
+import { listUserFavourites } from "@/app/server/listUserFavourites";
+import { listUserHistory } from "@/app/server/listUserHistory";
 
 export function StoreInitializer() {
   const setSongs = useAllSongsStore((state) => state.setSongs);
@@ -20,108 +25,91 @@ export function StoreInitializer() {
   const setUser = useUserStore((state) => state.setUser);
 
   useEffect(() => {
-    // Mock User
-    setUser({
-      id: "user_1",
-      name: "John Doe",
-      email: "john@example.com",
-    });
+    // Load all data from server
+    const loadData = async () => {
+      try {
+        // Load all songs
+        const songsData = await listAllSongs();
+        const songs = songsData.map((song) => ({
+          id: song.id.toString(),
+          title: song.title,
+          artist: song.artist_stage_name,
+          coverImageUrl: song.coverImageUrl || "",
+          songBaseUrl: song.songUrl || "",
+          duration: song.duration?.toString(),
+        }));
+        setSongs(songs);
 
-    // Mock Artists
-    const mockArtists: Artist[] = [
-      {
-        id: "artist_1",
-        artistName: "Akshay Kumar",
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      },
-      {
-        id: "artist_2",
-        artistName: "Priyanka Chopra",
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      },
-      {
-        id: "artist_3",
-        artistName: "Udit Narayan",
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      },
-    ];
-    setArtists(mockArtists);
+        // Load all artists
+        const artists = await listAllArtists();
+        setArtists(
+          artists.map((artist) => ({
+            id: artist.id.toString(),
+            artistName: artist.stage_name,
+            coverImageUrl: artist.profileImageUrl || "",
+          })),
+        );
 
-    // Mock Playlists
-    const mockPlaylists: Playlist[] = [
-      {
-        id: "playlist_1",
-        name: "90s Hits",
-        count: 12,
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      },
-      {
-        id: "playlist_2",
-        name: "Romantic Melodies",
-        count: 8,
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      },
-    ];
-    setPlaylists(mockPlaylists);
+        // Load system playlists
+        const systemPlaylists = await listSystemPlaylists();
+        setPlaylists(
+          systemPlaylists.map((playlist) => ({
+            id: playlist.id.toString(),
+            name: playlist.playlistName,
+            count: 0, // Count would need to be calculated or added to the query
+            coverImageUrl: playlist.playlistCoverImageUrl || "",
+          })),
+        );
 
-    // Mock Songs
-    const mockSongs: Song[] = [
-      {
-        id: "song_1",
-        title: "Aayega Maza Ab Barsaat Ka",
-        artist: "Akshay Kumar, Priyanka Chopra",
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-        songBaseUrl:
-          "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/555cd279-546f-4833-8a4f-57662d46853b-hassena",
-      },
-      {
-        id: "song_2",
-        title: "Barsaat Ke Din Aaye",
-        artist: "Udit Narayan, Alka Yagnik",
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-        songBaseUrl:
-          "https://musicstreamingprod.s3.ap-south-1.amazonaws.com/555cd279-546f-4833-8a4f-57662d46853b-hassena",
-      },
-    ];
-    setSongs(mockSongs);
+        // Load user playlists
+        const userPlaylists = await listUserPlaylists();
+        const setAllUserPlaylists =
+          useAllUserPlaylistStore.getState().setUserPlaylists;
+        setAllUserPlaylists(
+          userPlaylists.map((playlist) => ({
+            id: playlist.id.toString(),
+            name: playlist.playlist_name,
+            count: 0, // Count would need to be calculated or added to the query
+            coverImageUrl: "", // User playlists don't have cover images in the schema
+          })),
+        );
 
-    // Mock Artist Songs
-    const { setArtistSongs } = useArtistSongsStore.getState();
-    setArtistSongs("artist_1", [mockSongs[0]]);
-    setArtistSongs("artist_2", [mockSongs[1]]);
+        // Load user favourites
+        const favouritesData = await listUserFavourites();
+        const favourites = favouritesData
+          .filter((song) => song) // Filter out any null/undefined
+          .map((song) => ({
+            id: song.id.toString(),
+            title: song.title,
+            artist: song.artist_stage_name,
+            coverImageUrl: song.coverImageUrl || "",
+            songBaseUrl: song.songUrl || "",
+            duration: song.duration?.toString(),
+          }));
+        const setFavourites =
+          useUserFavouriteSongsStore.getState().setFavouriteSongs;
+        setFavourites(favourites);
 
-    // Mock User Playlists
-    const setAllUserPlaylists =
-      useAllUserPlaylistStore.getState().setUserPlaylists;
-    const mockUserPlaylists: Playlist[] = [
-      {
-        id: "user_playlist_1",
-        name: "My Favorites",
-        count: 5,
-        coverImageUrl:
-          "https://musicstreamingtemprory.s3.ap-south-1.amazonaws.com/1770968250600-Screenshot+2026-02-12+at+11.55.19%E2%80%AFPM.png",
-      },
-    ];
-    setAllUserPlaylists(mockUserPlaylists);
+        // Load user history
+        const historyData = await listUserHistory();
+        const history = historyData
+          .filter((song) => song) // Filter out any null/undefined
+          .map((song) => ({
+            id: song.id.toString(),
+            title: song.title,
+            artist: song.artist_stage_name,
+            coverImageUrl: song.coverImageUrl || "",
+            songBaseUrl: song.songUrl || "",
+            duration: song.duration?.toString(),
+          }));
+        const setHistory = useUserHistorySongsStore.getState().setHistorySongs;
+        setHistory(history);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
 
-    const setUserPlaylistSongs =
-      useAllUserPlaylistSongsStore.getState().setUserPlaylistSongs;
-    setUserPlaylistSongs("user_playlist_1", [mockSongs[0]]);
-
-    // Mock Favourites and History
-    const setFavourites =
-      useUserFavouriteSongsStore.getState().setFavouriteSongs;
-    setFavourites([mockSongs[1]]);
-
-    const setHistory = useUserHistorySongsStore.getState().setHistorySongs;
-    setHistory([mockSongs[0]]);
+    loadData();
   }, [setSongs, setPlaylists, setArtists, setUser]);
 
   return null;

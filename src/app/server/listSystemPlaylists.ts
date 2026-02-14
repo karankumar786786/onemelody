@@ -1,5 +1,5 @@
-"use server"
-import {client} from "@/lib/supabase";
+"use server";
+import { client } from "@/lib/supabase";
 
 
 export async function listSystemPlaylists() {
