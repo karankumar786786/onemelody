@@ -1,24 +1,16 @@
 "use client";
 import Link from "next/link";
-import {
-  House,
-  History,
-  Heart,
-  Music,
-  ListMusic,
-  PlusSquare,
-} from "lucide-react";
+import { House, History, Heart, Music, ListMusic, Plus } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import {
   Popover,
   PopoverContent,
-  PopoverDescription,
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
 } from "../ui/popover";
-import { Field, FieldGroup } from "../ui/field";
+import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import React, { useState } from "react";
@@ -63,7 +55,6 @@ function Leftside() {
         });
         setNewPlaylistName("");
         setIsPopoverOpen(false);
-        // console.log("Playlist created successfully");
       } else {
         console.error("Failed to create playlist:", result.error);
       }
@@ -77,10 +68,10 @@ function Leftside() {
   if (!isLoaded) return null;
 
   return (
-    <div className="h-full w-[17%]  border-zinc-800 flex flex-col bg-black">
+    <div className="h-full w-[17%] border-r border-zinc-800 flex flex-col bg-black">
       {/* Logo and Brand Name */}
       <Link href={"/"}>
-        <div className="flex items-center gap-3 px-6 py-6">
+        <div className="flex items-center gap-3 px-6 py-6 border-b border-zinc-800/50">
           <Image
             src={"/image.png"}
             width={40}
@@ -93,13 +84,13 @@ function Leftside() {
         </div>
       </Link>
 
-      <div className="flex flex-col px-3 h-full overflow-y-auto">
+      <div className="flex flex-col px-3 h-full overflow-y-auto pt-6">
         {/* User Greeting */}
         <div className="mb-6 px-3">
-          <p className="text-xs text-zinc-500 font-medium uppercase tracking-widest mb-1">
+          <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mb-1">
             Welcome back,
           </p>
-          <h2 className="text-lg font-semibold text-white truncate">
+          <h2 className="text-lg font-bold text-white truncate">
             {user?.fullName || "Guest"}
           </h2>
         </div>
@@ -110,10 +101,10 @@ function Leftside() {
             <Link
               key={item.label}
               href={item.href}
-              className="flex items-center gap-4 px-3 py-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-md transition-all group"
+              className="flex items-center gap-4 px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-all group"
             >
-              <item.icon className="w-5 h-5 group-hover:text-white transition-colors" />
-              <span className="font-medium text-sm">{item.label}</span>
+              <item.icon className="w-5 h-5 group-hover:text-green-500 transition-colors" />
+              <span className="font-semibold text-sm">{item.label}</span>
             </Link>
           ))}
         </nav>
@@ -122,38 +113,55 @@ function Leftside() {
         <div className="flex flex-col flex-1">
           <div className="flex items-center justify-between px-3 mb-4">
             <Link href={"/userplaylist"}>
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] hover:text-zinc-300 transition-colors">
                 Your Playlists
               </h3>
             </Link>
-            {mounted && (
+            {mounted && user && (
               <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                 <PopoverTrigger asChild>
-                  <button className="outline-none">
-                    <PlusSquare className="w-4 h-4 text-zinc-500 hover:text-white cursor-pointer transition-colors" />
+                  <button className="outline-none p-1 hover:bg-zinc-800 rounded-md transition-colors group">
+                    <Plus className="w-4 h-4 text-zinc-500 group-hover:text-white cursor-pointer transition-colors" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80" align="start">
-                  <PopoverHeader>
-                    <PopoverTitle>Create your playlist</PopoverTitle>
-                    <PopoverDescription>
-                      For uninturupted favourite songs
-                    </PopoverDescription>
+                <PopoverContent
+                  className="w-80 bg-zinc-900 border-zinc-800 shadow-2xl p-6"
+                  align="start"
+                  side="right"
+                >
+                  <PopoverHeader className="mb-4">
+                    <PopoverTitle className="text-lg font-bold text-white">
+                      Create Playlist
+                    </PopoverTitle>
                   </PopoverHeader>
                   <form onSubmit={handleCreatePlaylist}>
-                    <FieldGroup className="gap-4">
-                      <Field>playlist name</Field>
-                      <Input
-                        value={newPlaylistName}
-                        onChange={(e) => setNewPlaylistName(e.target.value)}
-                        placeholder="My Awesome Playlist"
-                        disabled={isCreating}
-                      />
+                    <FieldGroup className="gap-5">
+                      <Field>
+                        <FieldLabel className="text-xs font-bold text-zinc-500 uppercase mb-1.5 ml-1">
+                          Playlist Name
+                        </FieldLabel>
+                        <Input
+                          value={newPlaylistName}
+                          onChange={(e) => setNewPlaylistName(e.target.value)}
+                          placeholder="e.g. Late Night Vibes"
+                          className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-600 focus:ring-green-500/20 focus:border-green-500 h-11"
+                          disabled={isCreating}
+                          autoFocus
+                        />
+                      </Field>
                       <Button
                         type="submit"
+                        className="w-full bg-green-500 hover:bg-green-400 text-black font-bold h-11 transition-all active:scale-[0.98]"
                         disabled={isCreating || !newPlaylistName.trim()}
                       >
-                        {isCreating ? "Creating..." : "Submit"}
+                        {isCreating ? (
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                            Creating...
+                          </div>
+                        ) : (
+                          "Create Playlist"
+                        )}
                       </Button>
                     </FieldGroup>
                   </form>
