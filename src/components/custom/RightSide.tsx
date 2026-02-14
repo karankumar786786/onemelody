@@ -97,15 +97,22 @@ function RightSide() {
   const { user } = useUserStore();
   const { userPlaylists } = useAllUserPlaylistStore();
 
+  const playRandomSong = () => {
+    if (songs.length > 0) {
+      const randomIndex = Math.floor(Math.random() * songs.length);
+      useCurrentlyPlayingSongsStore
+        .getState()
+        .setCurrentSong(songs[randomIndex]);
+      setIsPlaying(true);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
 
     // Auto-play random song if none selected
     if (!currentSong && songs.length > 0) {
-      const randomIndex = Math.floor(Math.random() * songs.length);
-      useCurrentlyPlayingSongsStore
-        .getState()
-        .setCurrentSong(songs[randomIndex]);
+      playRandomSong();
     }
   }, [currentSong, songs]);
 
@@ -430,6 +437,7 @@ function RightSide() {
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", playRandomSong);
 
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
@@ -437,8 +445,16 @@ function RightSide() {
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", playRandomSong);
     };
-  }, [lyrics, currentCueIndex, setIsPlaying, setCurrentTime, setDuration]);
+  }, [
+    lyrics,
+    currentCueIndex,
+    setIsPlaying,
+    setCurrentTime,
+    setDuration,
+    playRandomSong,
+  ]);
 
   // Sync isPlaying state to audio element
   useEffect(() => {
@@ -807,7 +823,7 @@ function RightSide() {
             </Popover>
           )}
           <SkipBack
-            onClick={() => skip(-10)}
+            onClick={playRandomSong}
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
           />
           <div
@@ -821,7 +837,7 @@ function RightSide() {
             )}
           </div>
           <SkipForward
-            onClick={() => skip(10)}
+            onClick={playRandomSong}
             className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors"
           />
           <Heart
