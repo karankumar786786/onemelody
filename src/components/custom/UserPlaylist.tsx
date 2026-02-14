@@ -1,5 +1,5 @@
 import React from "react";
-import { Play } from "lucide-react";
+import { Play, Music } from "lucide-react";
 import Link from "next/link";
 
 interface PlaylistProps {
@@ -24,12 +24,18 @@ function UserPlaylist({
         {/* Left Section: Image and Name */}
         <div className="flex items-center gap-6 flex-1">
           {/* Playlist Image: Increased from 14 (56px) to 20 (80px) ~ approx 30%+ increase */}
-          <div className="relative h-20 w-20 flex-shrink-0 shadow-xl">
-            <img
-              src={coverImageUrl}
-              alt={name}
-              className="rounded-lg object-cover w-full h-full"
-            />
+          <div className="relative h-20 w-20 shrink-0 shadow-xl bg-zinc-800 rounded-lg overflow-hidden">
+            {coverImageUrl ? (
+              <img
+                src={coverImageUrl}
+                alt={name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-zinc-800">
+                <Music className="w-10 h-10 text-zinc-600" />
+              </div>
+            )}
             {/* Larger Overlay Play Icon */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
               <Play fill="white" size={24} className="text-white" />
@@ -48,7 +54,7 @@ function UserPlaylist({
         </div>
 
         {/* Right Section: Updated Date */}
-        <div className="text-right flex-shrink-0 ml-4">
+        <div className="text-right shrink-0 ml-4">
           <p className="text-zinc-500 text-sm font-medium group-hover:text-zinc-300 transition-colors">
             Updated {updatedAt}
           </p>

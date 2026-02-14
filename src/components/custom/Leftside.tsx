@@ -68,10 +68,10 @@ function Leftside() {
   if (!isLoaded) return null;
 
   return (
-    <div className="h-full w-[17%] border-r border-zinc-800 flex flex-col bg-black">
+    <div className="h-full w-[17%]  flex flex-col bg-black">
       {/* Logo and Brand Name */}
       <Link href={"/"}>
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-zinc-800/50">
+        <div className="flex items-center gap-3 px-6 py-6 ">
           <Image
             src={"/image.png"}
             width={40}
