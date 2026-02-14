@@ -8,14 +8,37 @@ import { useParams } from "next/navigation";
 import { useAllPlaylistSongsStore } from "@/Store/PlaylistSongs";
 import { useAllPlaylistStore } from "@/Store/AllPlaylistStore";
 import { useShallow } from "zustand/react/shallow";
+import { useEffect } from "react";
+import { listSongsByPlaylistId } from "@/app/server/listSongsByPlaylistId";
 
 function Playlist() {
   const { playlistId } = useParams();
+  const setPlaylistSongs = useAllPlaylistSongsStore(
+    (state) => state.setPlaylistSongs,
+  );
   const playlistSongs = useAllPlaylistSongsStore(
     useShallow((state) => state.playlistSongs[playlistId as string] || []),
   );
   const playlists = useAllPlaylistStore((state) => state.playlists);
   const playlist = playlists.find((p) => p.id === playlistId);
+
+  useEffect(() => {
+    if (playlistId) {
+      const fetchSongs = async () => {
+        const songsData = await listSongsByPlaylistId(Number(playlistId));
+        const mappedSongs = songsData.map((song: any) => ({
+          id: song.id.toString(),
+          title: song.title,
+          artist: song.artist_stage_name,
+          coverImageUrl: song.coverImageUrl || "",
+          songBaseUrl: song.songUrl || "",
+          duration: song.duration?.toString(),
+        }));
+        setPlaylistSongs(playlistId as string, mappedSongs);
+      };
+      fetchSongs();
+    }
+  }, [playlistId, setPlaylistSongs]);
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
@@ -30,7 +53,7 @@ function Playlist() {
           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
         />
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
 
         {/* Playlist Info Overlay */}
         <div className="absolute bottom-0 left-0 p-8 w-full">
@@ -46,7 +69,7 @@ function Playlist() {
       </div>
 
       {/* Content Section */}
-      <div className="px-8 py-8 bg-gradient-to-b from-zinc-900/50 to-black">
+      <div className="px-8 py-8 bg-linear-to-b from-zinc-900/50 to-black">
         <div className="max-w-4xl">
           <h1 className="text-2xl font-bold mb-4 text-zinc-300">
             {playlist?.name || "Playlist Name"}
@@ -61,7 +84,11 @@ function Playlist() {
             <SongHeader />
             <div className="flex flex-col space-y-1">
               {playlistSongs.map((song, index) => (
-                <SongItem key={song.id} song={song} index={index} />
+                <SongItem
+                  key={`${song.id}-${index}`}
+                  song={song}
+                  index={index}
+                />
               ))}
             </div>
           </div>

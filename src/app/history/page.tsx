@@ -21,7 +21,11 @@ function Page() {
             <SongHeader />
             <div className="flex flex-col space-y-1">
               {songs.map((song, index) => (
-                <SongItem key={song.id} song={song} index={index} />
+                <SongItem
+                  key={`${song.id}-${index}`}
+                  song={song}
+                  index={index}
+                />
               ))}
             </div>
           </div>
